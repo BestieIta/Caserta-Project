@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<!-- skill:chrome -->
+<style>
+/* Credit line — bottom-right */
+.design-ui-credit {
+  position: fixed;
+  bottom: 12px;
+  right: 12px;
+  font: 11px/1 system-ui, sans-serif;
+  color: rgba(128,128,128,0.5);
+  pointer-events: none;
+  z-index: 2147483647;
+  transition: opacity 0.4s ease;
+  user-select: none;
+  letter-spacing: 0.02em;
+}
+
+/* Hide chrome on touch devices */
+@media (hover: none) {
+  .design-ui-credit { display: none; }
+}
+
+/* Print fixes */
+@media print {
+  * {
+    transition: none !important;
+    animation: none !important;
+    box-shadow: none !important;
+  }
+  body {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  .design-ui-credit { display: none !important; }
+}
+
+</style>
+<script>
+(function () {
+    // Chrome UI (hover devices only): credit badge with idle-fade.
+    // Deferred until body exists since the script may run in <head>.
+    function initChromeUI() {
+        if (!matchMedia('(hover: hover)').matches) return;
+
+        var credit = document.createElement('div');
+        credit.className = 'design-ui-credit';
+        credit.setAttribute('aria-hidden', 'true');
+        credit.innerHTML = '\u{1F49C} by ClickUp Brain';
+        document.body.appendChild(credit);
+
+        var timer = null;
+        var fade = function (out) { credit.style.opacity = out ? '0' : ''; };
+        fade(true);
+        var show = function () {
+            fade(false);
+            clearTimeout(timer);
+            timer = setTimeout(function () { fade(true); }, 3000);
+        };
+        document.addEventListener('mousemove', show);
+        show();
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initChromeUI);
+    } else {
+        initChromeUI();
+    }
+})();
+
+</script>
+<!-- /skill:chrome -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Questionario di Candidatura</title>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: oklch(32% 0.04 280);
+    --primary-accent: oklch(45% 0.08 280);
+    --primary-light: oklch(95% 0.015 280);
+    --surface: oklch(99% 0.003 280);
+    --surface-alt: oklch(96.5% 0.007 280);
+    --text-primary: oklch(15% 0.01 280);
+    --text-secondary: oklch(35% 0.015 280);
+    --text-muted: oklch(52% 0.01 280);
+    --border: oklch(89% 0.012 280);
+    --border-strong: oklch(78% 0.02 280);
+    --danger: oklch(48% 0.18 25);
+    --danger-bg: oklch(95% 0.03 25);
+    --success: oklch(45% 0.14 155);
+    --success-bg: oklch(94% 0.03 155);
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--text-primary);
+    background: oklch(94% 0.006 280);
+    font-optical-sizing: auto;
+    min-height: 100vh;
+    padding: 48px 24px 120px;
+  }
+
+  .container {
+    max-width: 780px;
+    margin: 0 auto;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 48px;
+    padding: 56px 40px 48px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    position: relative;
+  }
+
+  .header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--primary);
+    border-radius: 16px 16px 0 0;
+  }
+
+  .header-badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--primary-accent);
+    background: var(--primary-light);
+    padding: 5px 14px;
+    border-radius: 100px;
+    margin-bottom: 24px;
+  }
+
+  .header h1 {
+    font-family: 'Crimson Pro', serif;
+    font-size: clamp(1.8rem, 4.5vw, 2.6rem);
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1.2;
+    text-wrap: balance;
+    margin-bottom: 16px;
+  }
+
+  .header-intro {
+    color: var(--text-secondary);
+    font-size: 0.92rem;
+    max-width: 58ch;
+    margin: 0 auto 24px;
+    line-height: 1.7;
+  }
+
+  .warning-box {
+    background: var(--danger-bg);
+    border: 1px solid oklch(88% 0.04 25);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-top: 20px;
+    text-align: left;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .warning-box p {
+    font-size: 0.82rem;
+    color: var(--danger);
+    font-weight: 500;
+    line-height: 1.6;
+  }
+
+  .warning-box p + p {
+    margin-top: 8px;
+  }
+
+  .section {
+    margin-bottom: 40px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 40px 36px;
+    transition: box-shadow 0.3s var(--ease-out-expo);
+  }
+
+  .section:hover {
+    box-shadow: 0 6px 32px oklch(0% 0 0 / 0.035);
+  }
+
+  .section-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+
+  .section-title {
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+  }
+
+  .section-desc {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 32px;
+    max-width: 60ch;
+    line-height: 1.6;
+  }
+
+  .field {
+    margin-bottom: 28px;
+  }
+
+  .field:last-child {
+    margin-bottom: 0;
+  }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .field-row-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+  }
+
+  @media (max-width: 640px) {
+    .field-row, .field-row-3 { grid-template-columns: 1fr; }
+    .section { padding: 28px 20px; }
+    .header { padding: 40px 20px 36px; }
+    body { padding: 24px 14px 80px; }
+  }
+
+  label {
+    display: block;
+    font-size: 0.84rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    line-height: 1.4;
+  }
+
+  label .req {
+    color: var(--danger);
+    margin-left: 2px;
+  }
+
+  .question-number {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--primary-accent);
+    background: var(--primary-light);
+    width: 22px;
+    height: 22px;
+    line-height: 22px;
+    text-align: center;
+    border-radius: 6px;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  select,
+  textarea {
+    width: 100%;
+    font-family: inherit;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 11px 14px;
+    transition: border-color 0.2s var(--ease-out-expo), box-shadow 0.2s var(--ease-out-expo);
+    outline: none;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--primary-accent);
+    box-shadow: 0 0 0 3px oklch(45% 0.08 280 / 0.08);
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 110px;
+    line-height: 1.6;
+  }
+
+  textarea.large {
+    min-height: 160px;
+  }
+
+  textarea.xl {
+    min-height: 200px;
+  }
+
+  select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23555' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+    cursor: pointer;
+  }
+
+  .helper {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-top: 5px;
+    line-height: 1.5;
+    font-style: italic;
+  }
+
+  .scenario {
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 22px;
+    margin-bottom: 12px;
+  }
+
+  .scenario-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--primary-accent);
+    margin-bottom: 8px;
+  }
+
+  .scenario-text {
+    font-size: 0.88rem;
+    color: var(--text-primary);
+    line-height: 1.65;
+    font-weight: 400;
+  }
+
+  .divider-light {
+    border: none;
+    border-top: 1px dashed oklch(90% 0.008 280);
+    margin: 28px 0;
+  }
+
+  .footer-section {
+    text-align: center;
+    margin-top: 48px;
+    padding: 40px 36px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+  }
+
+  .footer-section .disclaimer {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    max-width: 54ch;
+    margin: 0 auto 12px;
+    line-height: 1.6;
+  }
+
+  .footer-section .disclaimer strong {
+    color: var(--text-secondary);
+  }
+
+  .submit-btn {
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--surface);
+    background: var(--primary);
+    border: none;
+    border-radius: 10px;
+    padding: 14px 44px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: transform 0.15s var(--ease-out-expo), background 0.2s;
+  }
+
+  .submit-btn:hover {
+    background: var(--primary-accent);
+    transform: translateY(-1px);
+  }
+
+  .submit-btn:active {
+    transform: translateY(0);
+  }
+
+  .submit-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .confidential-notice {
+    background: var(--primary-light);
+    border: 1px solid oklch(88% 0.02 280);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-top: 24px;
+    max-width: 560px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .confidential-notice p {
+    font-size: 0.78rem;
+    color: var(--primary);
+    font-weight: 500;
+    line-height: 1.55;
+    text-align: center;
+  }
+
+  /* Status messages */
+  .status-msg {
+    display: none;
+    padding: 14px 20px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-top: 20px;
+    text-align: center;
+  }
+
+  .status-msg.success {
+    display: block;
+    background: var(--success-bg);
+    border: 1px solid oklch(82% 0.04 155);
+    color: var(--success);
+  }
+
+  .status-msg.error {
+    display: block;
+    background: var(--danger-bg);
+    border: 1px solid oklch(88% 0.04 25);
+    color: var(--danger);
+  }
+
+  .status-msg.loading {
+    display: block;
+    background: var(--primary-light);
+    border: 1px solid oklch(88% 0.02 280);
+    color: var(--primary-accent);
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <header class="header">
+    <div class="header-badge">Documento riservato</div>
+    <h1>Questionario di Candidatura</h1>
+    <p class="header-intro">
+      Stai facendo domanda per una delle posizioni più importanti e delicate all'interno dell'ambiente criminale del server. Il nome della posizione, le sue funzioni specifiche e i dettagli operativi non verranno rivelati in questa fase. Solo i candidati selezionati riceveranno ulteriori informazioni.
+    </p>
+    <p class="header-intro" style="margin-bottom: 0;">
+      Questo questionario è progettato per essere lungo, impegnativo e selettivo. L'obiettivo è filtrare la stragrande maggioranza dei candidati, privilegiando maturità, qualità del ragionamento, capacità di osservazione e neutralità rispetto alla semplice esperienza.
+    </p>
+
+    <div class="warning-box">
+      <p><strong>AVVERTENZA:</strong> Qualsiasi forma di abuso di potere, favoritismo, comportamento non professionale, violazione della riservatezza o condotta non conforme agli standard richiesti comporterà la rimozione immediata e permanente dalla posizione, senza possibilità di appello.</p>
+      <p>I risultati verranno comunicati in privato, singolarmente. Non sarà resa nota l'identità di chi viene accettato e chi no. Consultare chat pubbliche o private alla ricerca di risposte o aiuti garantisce il rifiuto della domanda.</p>
+    </div>
+  </header>
+
+  <form id="candidatura-form">
+
+  <!-- SEZIONE 1 -->
+  <section class="section">
+    <div class="section-label">Sezione 01</div>
+    <h2 class="section-title">Informazioni Generali</h2>
+    <p class="section-desc">Dati di base per identificarti e valutare la tua disponibilità.</p>
+
+    <div class="field-row">
+      <div class="field">
+        <label><span class="question-number">1</span>Nome Discord <span class="req">*</span></label>
+        <input type="text" name="discord" required placeholder="es. username o username">
+      </div>
+      <div class="field">
+        <label><span class="question-number">2</span>Username Roblox <span class="req">*</span></label>
+        <input type="text" name="roblox" required placeholder="Il tuo display name e username">
+      </div>
+    </div>
+
+    <div class="field-row-3">
+      <div class="field">
+        <label><span class="question-number">3</span>Età <span class="req">*</span></label>
+        <input type="number" name="eta" required placeholder="es. 17" min="13" max="99">
+      </div>
+      <div class="field">
+        <label><span class="question-number">4</span>Fuso orario <span class="req">*</span></label>
+        <select name="fuso_orario" required>
+          <option value="" disabled selected>Seleziona</option>
+          <option value="CET/CEST (Italia)">CET / CEST (Italia)</option>
+          <option value="GMT/BST (UK)">GMT / BST (UK)</option>
+          <option value="EST/EDT (NA Est)">EST / EDT (NA Est)</option>
+          <option value="PST/PDT (NA Ovest)">PST / PDT (NA Ovest)</option>
+          <option value="Altro">Altro</option>
+        </select>
+      </div>
+      <div class="field">
+        <label><span class="question-number">5</span>Ore medie giornaliere <span class="req">*</span></label>
+        <input type="text" name="ore_giornaliere" required placeholder="es. 3-4 ore">
+      </div>
+    </div>
+
+    <div class="field">
+      <label><span class="question-number">6</span>Da quanto tempo fai roleplay su Roblox o altre piattaforme? <span class="req">*</span></label>
+      <input type="text" name="esperienza_rp" required placeholder="es. 2 anni su Roblox, 1 anno su FiveM">
+    </div>
+
+    <div class="field">
+      <label><span class="question-number">7</span>Elenca i server RP in cui hai giocato e il tuo ruolo principale in ciascuno <span class="req">*</span></label>
+      <textarea name="server_precedenti" required placeholder="Nome server, piattaforma, ruolo ricoperto, durata approssimativa. Sii specifico."></textarea>
+    </div>
+
+    <div class="field">
+      <label><span class="question-number">8</span>Hai mai ricoperto posizioni staff, whitelist o ruoli di responsabilità in un server RP?</label>
+      <textarea name="esperienze_staff" placeholder="Se sì, descrivi il ruolo, le responsabilità e perché hai lasciato (se applicabile). Se no, scrivi 'No'."></textarea>
+    </div>
+  </section>
+
+  <!-- SEZIONE 2 -->
+  <section class="section">
+    <div class="section-label">Sezione 02</div>
+    <h2 class="section-title">Conoscenza del Roleplay</h2>
+    <p class="section-desc">Rispondi con parole tue. Non copiare definizioni da internet: vogliamo capire se hai interiorizzato questi concetti, non se sai cercarli su Google.</p>
+
+    <div class="field">
+      <label><span class="question-number">1</span>Cos'è il metagaming? Fornisci la tua definizione e un esempio concreto di metagaming in un contesto criminale RP. <span class="req">*</span></label>
+      <textarea class="large" name="metagaming" required placeholder="Definizione + esempio pratico"></textarea>
+    </div>
+
+    <div class="field">
+      <label><span class="question-number">2</span>Cos'è il powergaming? Descrivi una situazione in cui un giocatore fa powergaming senza rendersene conto. <span class="req">*</span></label>
+      <textarea class="large" name="powergaming" required placeholder="Definizione + esempio di powergaming inconsapevole"></textarea>
+    </div>
+
+    <div class="field">
+      <label><span class="question-number">3</span>Cos'è il failRP? Fai un esempio di failRP sottile (non quello ovvio di chi non sa giocare, ma quello di chi crede di fare bene). <span class="req">*</span></label>
+      <textarea class="large" name="failrp" required placeholder="Definizione + esempio di failRP 'mascherato'"></textarea>
+    </div>
+
+    <div class="field">
+      <label><span class="question-number">4</span>Qual è la differenza tra conoscenza IC (In Character) e OOC (Out Of Character)? Perché questa distinzione è fondamentale in un ambiente criminale RP? <span class="req">*</span></label>
+      <textarea class="large" name="ic_ooc" required placeholder="Spiega la distinzione e perché è critica"></textarea>
+    </div>
+
+    <div class="field">
+      <label><span class="question-number">5</span>Come si gestiscono informazioni sensibili all'interno del roleplay? Se il tuo personaggio viene a conoscenza di qualcosa di delicato, come ti comporti? <span class="req">*</span></label>
+      <textarea class="large" name="info_sensibili" required placeholder="Descrivi il tuo approccio alla gestione di informazioni IC delicate"></textarea>
+    </div>
+
+    <div class="field">
+      <label><span class="question-number">6</span>Cos'è per te l'immersione narrativa? Come la mantieni durante sessioni lunghe, anche quando il RP rallenta o diventa monotono? <span class="req">*</span></label>
+      <textarea class="large" name="immersione" required placeholder="Parla della coerenza narrativa e di come resti in personaggio"></textarea>
+    </div>
+  </section>
+
+  <!-- SEZIONE 3 -->
+  <section class="section">
+    <div class="section-label">Sezione 03</div>
+    <h2 class="section-title">Neutralità e Imparzialità</h2>
+    <p class="section-desc">Questa posizione richiede la capacità assoluta di separare rapporti personali e responsabilità. Rispondi con onestà: preferiamo un candidato consapevole dei propri limiti a uno che finge di non averne.</p>
+
+    <div class="field">
+      <label><span class="question-number">1</span>Sei in grado di separare completamente le tue amicizie dalle tue responsabilità IC? Descrivi come lo faresti concretamente. <span class="req">*</span></label>
+      <textarea class="large" name="separare_amicizie" required placeholder="Non limitarti a dire 'sì'. Spiega come."></textarea>
+    </div>
+
+    <div class="field">
+      <label><span class="question-number">2</span>Racconta una situazione (reale o ipotetica) in cui hai dovuto dire no a un amico per mantenere l'integrità di un progetto, un server o un gruppo. <span class="req">*</span></label>
+      <textarea class="large" name="dire_no" required placeholder="Situazione concreta + come hai gestito la reazione dell'amico"></textarea>
+    </div>
+
+    <div class="field">
+      <label><span class="question-number">3</span>Come gestiresti un conflitto di interesse? Ad esempio: il tuo migliore amico fa parte di una fazione che stai valutando. Come ti comporti? <span class="req">*</span></label>
+      <textarea class="large" name="conflitto_interesse" required placeholder="Descrivi il tuo processo decisionale"></textarea>
+    </div>
+
+    <div class="field">
+      <label><span class="question-number">4</span>Un'organizzazione potente cerca di farti pressione affinché tu prenda una decisione a loro favore. Minacciano di creare problemi se non collabori. Come reagisci? <span class="req">*</span></label>
+      <textarea class="large" name="pressioni" required placeholder="Descrivi la tua reazione e il ragionamento dietro"></textarea>
+    </div>
+
+    <div class="field">
+      <label><span class="question-number">5</span>Credi che la totale imparzialità sia possibile? Se sì, come la raggiungi. Se no, come compensi i tuoi bias naturali? <span class="req">*</span></label>
+      <textarea class="large" name="imparzialita" required placeholder="Riflessione personale"></textarea>
+    </div>
+  </section>
+
+  <!-- SEZIONE 4 -->
+  <section class="section">
+    <div class="section-label">Sezione 04</div>
+    <h2 class="section-title">Scenari Roleplay Avanzati</h2>
+    <p class="section-desc">Leggi ogni scenario con attenzione. Rispondi come se fossi realmente nella situazione descritta. La qualità del ragionamento conta più della lunghezza. Non esistono risposte "giuste": cerchiamo maturità, coerenza e capacità di pensiero critico.</p>
+
+    <!-- Scenario 1 -->
+    <div class="scenario">
+      <div class="scenario-label">Scenario 1: Amicizia e dovere</div>
+      <p class="scenario-text">Un tuo amico stretto, con cui giochi da anni e con cui hai un rapporto solido anche fuori dal server, ti chiede un favore direttamente legato alla tua posizione. Non ti chiede qualcosa di enorme, ma qualcosa che rappresenterebbe comunque un trattamento preferenziale. Insiste dicendo che "tra amici ci si aiuta" e che nessuno lo saprebbe mai. Come reagisci? Cosa gli dici? Come gestisci il rapporto dopo?</p>
+    </div>
+    <div class="field">
+      <label>La tua risposta <span class="req">*</span></label>
+      <textarea class="xl" name="scenario_1" required placeholder="Rispondi in modo completo e ragionato"></textarea>
+    </div>
+
+    <hr class="divider-light">
+
+    <!-- Scenario 2 -->
+    <div class="scenario">
+      <div class="scenario-label">Scenario 2: Organizzazione mista</div>
+      <p class="scenario-text">Noti una nuova organizzazione criminale nel server. Alcuni membri producono roleplay di altissimo livello: scene costruite, dialoghi realistici, coerenza narrativa. Tuttavia, altri membri dello stesso gruppo si comportano in modo immaturo, rompono l'immersione, e sembrano non prendere sul serio il RP. Il leader del gruppo è tra quelli bravi. Come valuti la situazione complessiva? Cosa consideri? Come procedi?</p>
+    </div>
+    <div class="field">
+      <label>La tua risposta <span class="req">*</span></label>
+      <textarea class="xl" name="scenario_2" required placeholder="Descrivi il tuo ragionamento e le azioni che intraprenderesti"></textarea>
+    </div>
+
+    <hr class="divider-light">
+
+    <!-- Scenario 3 -->
+    <div class="scenario">
+      <div class="scenario-label">Scenario 3: Due fazioni rivali</div>
+      <p class="scenario-text">Due fazioni rivali, entrambe rispettabili e con buon roleplay, cercano attivamente di ottenere la tua fiducia e il tuo favore. Entrambe ti avvicinano IC, ti offrono collaborazione, e cercano di costruire un rapporto con il tuo personaggio. Come gestisci il rapporto con entrambe senza comprometterti? Come mantieni equidistanza senza risultare freddo o sospetto?</p>
+    </div>
+    <div class="field">
+      <label>La tua risposta <span class="req">*</span></label>
+      <textarea class="xl" name="scenario_3" required placeholder="Spiega la tua strategia diplomatica IC"></textarea>
+    </div>
+
+    <hr class="divider-light">
+
+    <!-- Scenario 4 -->
+    <div class="scenario">
+      <div class="scenario-label">Scenario 4: Talento vs. reputazione</div>
+      <p class="scenario-text">Un giocatore produce roleplay eccellente: scene curate, dialoghi profondi, coerenza totale con il suo personaggio. Tuttavia, ha una pessima reputazione OOC: è noto per essere tossico in chat, per aver causato drama in passato, e alcuni lo considerano inaffidabile come persona. Come pesi questi due aspetti? Cosa conta di più nel tuo processo di valutazione? Come procedi?</p>
+    </div>
+    <div class="field">
+      <label>La tua risposta <span class="req">*</span></label>
+      <textarea class="xl" name="scenario_4" required placeholder="Ragiona sulla tensione tra qualità IC e comportamento OOC"></textarea>
+    </div>
+
+    <hr class="divider-light">
+
+    <!-- Scenario 5 -->
+    <div class="scenario">
+      <div class="scenario-label">Scenario 5: Il giocatore costante</div>
+      <p class="scenario-text">Un giocatore non eccelle nel roleplay: le sue scene sono nella media, i dialoghi non brillano, non ha momenti memorabili. Tuttavia, è estremamente attivo, sempre presente, sempre coinvolto nella community, aiuta i nuovi arrivati e non causa mai problemi. Come lo valuti? La costanza e l'affidabilità possono compensare la mancanza di talento puro nel RP?</p>
+    </div>
+    <div class="field">
+      <label>La tua risposta <span class="req">*</span></label>
+      <textarea class="xl" name="scenario_5" required placeholder="Esprimi la tua opinione e il ragionamento dietro"></textarea>
+    </div>
+
+    <hr class="divider-light">
+
+    <!-- Scenario 6 -->
+    <div class="scenario">
+      <div class="scenario-label">Scenario 6: Informazioni OOC</div>
+      <p class="scenario-text">Vieni a conoscenza, fuori dal personaggio (in una chat OOC, da uno screen condiviso, o da una conversazione privata), di informazioni che potrebbero avvantaggiare significativamente una fazione o un giocatore all'interno del RP. Nessuno saprebbe mai che hai queste informazioni. Cosa fai? Come ti comporti nelle scene successive con i giocatori coinvolti?</p>
+    </div>
+    <div class="field">
+      <label>La tua risposta <span class="req">*</span></label>
+      <textarea class="xl" name="scenario_6" required placeholder="Descrivi come gestisci la separazione IC/OOC in pratica"></textarea>
+    </div>
+
+    <hr class="divider-light">
+
+    <!-- Scenario 7 -->
+    <div class="scenario">
+      <div class="scenario-label">Scenario 7: Tentativi di manipolazione</div>
+      <p class="scenario-text">Un gruppo di giocatori ha capito (o crede di aver capito) quale sia la tua funzione nel server. Iniziano a cercare di ottenere vantaggi tramite conoscenze OOC: ti mandano messaggi ambigui, cercano di fare "amicizia" in modo calcolato, e provano a influenzarti senza essere troppo diretti. Come riconosci questi comportamenti? Come li gestisci senza creare conflitto aperto?</p>
+    </div>
+    <div class="field">
+      <label>La tua risposta <span class="req">*</span></label>
+      <textarea class="xl" name="scenario_7" required placeholder="Come identifichi e gestisci la manipolazione sociale"></textarea>
+    </div>
+
+    <hr class="divider-light">
+
+    <!-- Scenario 8 -->
+    <div class="scenario">
+      <div class="scenario-label">Scenario 8: Difendere una posizione</div>
+      <p class="scenario-text">Dopo settimane di osservazione, sei convinto che un'organizzazione stia producendo roleplay di altissimo livello. Le loro scene sono coerenti, i personaggi hanno profondità, e il gruppo contribuisce significativamente all'ecosistema RP del server. Tuttavia, alcuni membri dello staff hanno dubbi: ritengono che il gruppo sia "troppo chiuso" o che alcuni membri abbiano avuto problemi in passato. Come argomenti la tua posizione? Come bilanci la tua opinione con quella di chi ha autorità?</p>
+    </div>
+    <div class="field">
+      <label>La tua risposta <span class="req">*</span></label>
+      <textarea class="xl" name="scenario_8" required placeholder="Come difendi una valutazione con dati ed esempi concreti"></textarea>
+    </div>
+
+    <hr class="divider-light">
+
+    <!-- Scenario 9 -->
+    <div class="scenario">
+      <div class="scenario-label">Scenario 9: Nessun candidato adeguato</div>
+      <p class="scenario-text">Sono passate settimane. Hai osservato decine di giocatori, hai valutato organizzazioni, hai partecipato a scene e raccolto informazioni. Ma non hai ancora trovato nessuno che ritenga veramente adeguato per il livello richiesto. La pressione aumenta: qualcuno ti chiede risultati, altri iniziano a dubitare della tua capacità. Come procedi? Abbassi gli standard? Aspetti? Cambi approccio?</p>
+    </div>
+    <div class="field">
+      <label>La tua risposta <span class="req">*</span></label>
+      <textarea class="xl" name="scenario_9" required placeholder="Come gestisci la pressione senza compromettere la qualità"></textarea>
+    </div>
+
+    <hr class="divider-light">
+
+    <!-- Scenario 10 -->
+    <div class="scenario">
+      <div class="scenario-label">Scenario 10: Il tuo metodo</div>
+      <p class="scenario-text">Descrivi nel dettaglio il tuo metodo ideale per valutare se un giocatore merita fiducia all'interno di un ambiente criminale RP. Quali criteri usi? Quanto tempo dedichi all'osservazione? Come distingui chi è genuinamente bravo da chi sa solo "sembrare" bravo? Come verifichi la coerenza nel tempo? Quali red flags cerchi?</p>
+    </div>
+    <div class="field">
+      <label>La tua risposta <span class="req">*</span></label>
+      <textarea class="xl" name="scenario_10" required placeholder="Esponi il tuo sistema di valutazione completo"></textarea>
+    </div>
+  </section>
+
+  <!-- SEZIONE 5 -->
+  <section class="section">
+    <div class="section-label">Sezione 05</div>
+    <h2 class="section-title">Psicologia del Candidato</h2>
+    <p class="section-desc">Qui non cerchiamo risposte "corrette". Cerchiamo autenticità, capacità di introspezione e una mentalità orientata al roleplay collettivo piuttosto che individuale.</p>
+
+    <div class="field">
+      <label><span class="question-number">1</span>Cosa significa per te "creare RP per gli altri"? È qualcosa che fai attivamente o qualcosa che accade come conseguenza del tuo gioco? <span class="req">*</span></label>
+      <textarea class="large" name="creare_rp" required placeholder="Rifletti sul tuo approccio al roleplay come servizio alla community"></textarea>
+    </div>
+
+    <div class="field">
+      <label><span class="question-number">2</span>Preferisci essere protagonista o facilitatore? Spiega perché e in quali situazioni l'uno è più appropriato dell'altro. <span class="req">*</span></label>
+      <textarea class="large" name="protagonista_facilitatore" required placeholder="Non esiste una risposta giusta. Vogliamo capire la tua consapevolezza."></textarea>
+    </div>
+
+    <div class="field">
+      <label><span class="question-number">3</span>Racconta una situazione concreta in cui hai rinunciato a un vantaggio personale (IC o OOC) per migliorare il roleplay generale o l'esperienza di altri giocatori. <span class="req">*</span></label>
+      <textarea class="large" name="rinuncia_vantaggio" required placeholder="Esempio reale dalla tua esperienza RP"></textarea>
+    </div>
+
+    <div class="field">
+      <label><span class="question-number">4</span>Qual è la differenza tra "vincere una scena" e "creare una buona scena"? Quale delle due prioritizzi e perché? <span class="req">*</span></label>
+      <textarea class="large" name="vincere_vs_creare" required placeholder="Riflessione sulla differenza tra ego e narrazione"></textarea>
+    </div>
+
+    <div class="field">
+      <label><span class="question-number">5</span>Come reagisci emotivamente quando qualcosa nel RP non va come vorresti? Sei in grado di distinguere la frustrazione IC da quella OOC? <span class="req">*</span></label>
+      <textarea class="large" name="gestione_emotiva" required placeholder="Onestà sulla gestione emotiva"></textarea>
+    </div>
+  </section>
+
+  <!-- SEZIONE 6 -->
+  <section class="section">
+    <div class="section-label">Sezione 06</div>
+    <h2 class="section-title">Valutazione Finale</h2>
+    <p class="section-desc">Un'ultima domanda. Prenditi il tempo necessario per rispondere in modo completo e riflessivo. Questa risposta avrà un peso significativo nella valutazione.</p>
+
+    <div class="field">
+      <label>Perché ritieni di essere adatto a una posizione che richiede assoluta discrezione, imparzialità, maturità e capacità di influenzare indirettamente il roleplay di decine di giocatori? <span class="req">*</span></label>
+      <textarea class="xl" name="valutazione_finale" required placeholder="Rispondi in modo ampio, personale e onesto. Non c'è un limite di lunghezza. Questa è la tua opportunità di convincerci."></textarea>
+      <p class="helper">Questa domanda non ha una risposta modello. Cerchiamo consapevolezza di sé, umiltà e visione.</p>
+    </div>
+  </section>
+
+  <!-- SUBMIT -->
+  <div class="footer-section">
+    <p class="disclaimer">Compilando e inviando questo questionario confermi di aver letto e compreso le condizioni sopra indicate. Dichiari che tutte le risposte sono state scritte da te personalmente e che accetti il processo di selezione così come descritto.</p>
+    <p class="disclaimer"><strong>I risultati verranno comunicati in privato, singolarmente.</strong> Non verrà resa nota l'identità di chi viene accettato e chi viene rifiutato. Qualsiasi tentativo di scoprire o diffondere queste informazioni sarà considerato una violazione della riservatezza.</p>
+
+    <div class="confidential-notice">
+      <p>Questo documento è riservato. Non condividerlo, non discuterne con altri candidati, e non fare screenshot. La riservatezza inizia dal momento in cui leggi questo testo.</p>
+    </div>
+
+    <button type="submit" class="submit-btn" id="submit-btn">Invia Candidatura</button>
+    <div id="status-msg" class="status-msg"></div>
+  </div>
+
+  </form>
+</div>
+
+<script>
+const WEBHOOK_URL = "https://discord.com/api/webhooks/1519521961498116156/I5jORtKsKAHrQPN2-Vpcwd3pTsNRjp6dnTIxnjh7_mbOmAePUEYGDNXcfO7xoa3EuemA";
+
+document.getElementById('candidatura-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  const btn = document.getElementById('submit-btn');
+  const statusEl = document.getElementById('status-msg');
+  
+  btn.disabled = true;
+  btn.textContent = 'Invio in corso...';
+  statusEl.className = 'status-msg loading';
+  statusEl.textContent = 'Invio della candidatura in corso...';
+  
+  const form = new FormData(this);
+  const data = Object.fromEntries(form.entries());
+  
+  // Build embeds for Discord
+  const embeds = [];
+  
+  // Embed 1: Info generali
+  embeds.push({
+    title: "📋 NUOVA CANDIDATURA",
+    color: 0x2c2f33,
+    fields: [
+      { name: "Discord", value: data.discord || "N/A", inline: true },
+      { name: "Roblox", value: data.roblox || "N/A", inline: true },
+      { name: "Età", value: data.eta || "N/A", inline: true },
+      { name: "Fuso Orario", value: data.fuso_orario || "N/A", inline: true },
+      { name: "Ore Giornaliere", value: data.ore_giornaliere || "N/A", inline: true },
+      { name: "Esperienza RP", value: data.esperienza_rp || "N/A", inline: true },
+      { name: "Server Precedenti", value: truncate(data.server_precedenti, 1024) },
+      { name: "Esperienze Staff", value: truncate(data.esperienze_staff || "Non specificato", 1024) }
+    ],
+    timestamp: new Date().toISOString()
+  });
+
+  // Embed 2: Conoscenza RP
+  embeds.push({
+    title: "📖 Sezione 2: Conoscenza del Roleplay",
+    color: 0x5865f2,
+    fields: [
+      { name: "Metagaming", value: truncate(data.metagaming, 1024) },
+      { name: "Powergaming", value: truncate(data.powergaming, 1024) },
+      { name: "FailRP", value: truncate(data.failrp, 1024) },
+      { name: "IC vs OOC", value: truncate(data.ic_ooc, 1024) },
+      { name: "Info Sensibili", value: truncate(data.info_sensibili, 1024) },
+      { name: "Immersione", value: truncate(data.immersione, 1024) }
+    ]
+  });
+
+  // Embed 3: Neutralità
+  embeds.push({
+    title: "⚖️ Sezione 3: Neutralità e Imparzialità",
+    color: 0xeb459e,
+    fields: [
+      { name: "Separare Amicizie", value: truncate(data.separare_amicizie, 1024) },
+      { name: "Dire No", value: truncate(data.dire_no, 1024) },
+      { name: "Conflitto di Interesse", value: truncate(data.conflitto_interesse, 1024) },
+      { name: "Pressioni", value: truncate(data.pressioni, 1024) },
+      { name: "Imparzialità", value: truncate(data.imparzialita, 1024) }
+    ]
+  });
+
+  // Send first batch (max 10 embeds per message)
+  try {
+    let response = await fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        content: `**━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━**\n## 📨 Nuova Candidatura Ricevuta\n**Candidato:** ${data.discord} | **Roblox:** ${data.roblox}\n**━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━**`,
+        embeds: embeds
+      })
+    });
+
+    if (!response.ok) throw new Error('Errore nell\'invio');
+
+    // Wait a moment for rate limits
+    await delay(1000);
+
+    // Embed 4-5: Scenari (split due to field limits)
+    const scenariEmbeds1 = {
+      title: "🎭 Sezione 4: Scenari (1-5)",
+      color: 0xfee75c,
+      fields: [
+        { name: "Scenario 1: Amicizia e dovere", value: truncate(data.scenario_1, 1024) },
+        { name: "Scenario 2: Organizzazione mista", value: truncate(data.scenario_2, 1024) },
+        { name: "Scenario 3: Due fazioni rivali", value: truncate(data.scenario_3, 1024) },
+        { name: "Scenario 4: Talento vs. reputazione", value: truncate(data.scenario_4, 1024) },
+        { name: "Scenario 5: Il giocatore costante", value: truncate(data.scenario_5, 1024) }
+      ]
+    };
+
+    const scenariEmbeds2 = {
+      title: "🎭 Sezione 4: Scenari (6-10)",
+      color: 0xfee75c,
+      fields: [
+        { name: "Scenario 6: Informazioni OOC", value: truncate(data.scenario_6, 1024) },
+        { name: "Scenario 7: Tentativi di manipolazione", value: truncate(data.scenario_7, 1024) },
+        { name: "Scenario 8: Difendere una posizione", value: truncate(data.scenario_8, 1024) },
+        { name: "Scenario 9: Nessun candidato adeguato", value: truncate(data.scenario_9, 1024) },
+        { name: "Scenario 10: Il tuo metodo", value: truncate(data.scenario_10, 1024) }
+      ]
+    };
+
+    response = await fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ embeds: [scenariEmbeds1, scenariEmbeds2] })
+    });
+
+    if (!response.ok) throw new Error('Errore nell\'invio scenari');
+
+    await delay(1000);
+
+    // Embed 6: Psicologia + Finale
+    const psicologiaEmbed = {
+      title: "🧠 Sezione 5: Psicologia del Candidato",
+      color: 0x57f287,
+      fields: [
+        { name: "Creare RP per gli altri", value: truncate(data.creare_rp, 1024) },
+        { name: "Protagonista o Facilitatore", value: truncate(data.protagonista_facilitatore, 1024) },
+        { name: "Rinuncia a un vantaggio", value: truncate(data.rinuncia_vantaggio, 1024) },
+        { name: "Vincere vs. Creare", value: truncate(data.vincere_vs_creare, 1024) },
+        { name: "Gestione Emotiva", value: truncate(data.gestione_emotiva, 1024) }
+      ]
+    };
+
+    const finaleEmbed = {
+      title: "⭐ Sezione 6: Valutazione Finale",
+      color: 0xed4245,
+      description: truncate(data.valutazione_finale, 4096),
+      footer: { text: `Candidatura inviata il ${new Date().toLocaleString('it-IT')}` }
+    };
+
+    response = await fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ embeds: [psicologiaEmbed, finaleEmbed] })
+    });
+
+    if (!response.ok) throw new Error('Errore nell\'invio finale');
+
+    // Success
+    statusEl.className = 'status-msg success';
+    statusEl.textContent = '✓ Candidatura inviata con successo. Riceverai una risposta in privato.';
+    btn.textContent = 'Candidatura Inviata';
+    btn.disabled = true;
+
+  } catch (error) {
+    statusEl.className = 'status-msg error';
+    statusEl.textContent = '✗ Errore durante l\'invio. Riprova tra qualche secondo.';
+    btn.disabled = false;
+    btn.textContent = 'Invia Candidatura';
+  }
+});
+
+function truncate(str, max) {
+  if (!str) return "N/A";
+  return str.length > max ? str.substring(0, max - 3) + "..." : str;
+}
+
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+</script>
+
+</body>
+</html>
